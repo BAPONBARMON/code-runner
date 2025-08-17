@@ -1,0 +1,197 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Professional Live Code Runner</title>
+<style>
+  body { margin:0; font-family:sans-serif; display:flex; flex-direction:column; height:100vh; background:#ececec; }
+  .toolbar { background:#222; color:#fff; padding:6px; display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+  .toolbar input, .toolbar select, .toolbar button { padding:5px 10px; font-size:14px; }
+
+  #editorContainer { flex:1; display:flex; overflow:hidden; }
+  #editor { flex:0 0 40%; background:#f4f4f4; padding:5px; min-width:50px; min-height:50px; }
+
+  #previewContainer { flex:0 0 60%; display:flex; flex-direction:column; border-left:3px solid #444; background:#fdfdf8; box-shadow: inset 0 0 5px rgba(0,0,0,0.1); }
+
+  /* Browser-like toolbar */
+  #previewToolbar { background:#ddd; padding:4px 6px; display:flex; gap:5px; align-items:center; box-shadow: inset 0 -1px 2px rgba(0,0,0,0.1); border-bottom:1px solid #bbb; }
+  #previewToolbar button { padding:3px 8px; font-size:13px; border:none; background:#f5f5f5; cursor:pointer; border-radius:3px; transition: 0.2s; }
+  #previewToolbar button:hover { background:#e0e0e0; }
+  #previewToolbar input { flex:1; padding:4px 6px; font-size:13px; border:1px solid #bbb; border-radius:4px; }
+
+  #preview { flex:1; border:none; width:100%; height:100%; }
+
+  @media(max-width:900px){ 
+    #editorContainer { flex-direction:column; }
+    #editor { flex:0 0 40%; }
+    #previewContainer { flex:0 0 60%; border-left:none; border-top:3px solid #444; }
+  }
+
+  .myHighlight { background: yellow; }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs/loader.js"></script>
+</head>
+<body>
+
+<div class="toolbar">
+  <button onclick="runCode()">▶ Run</button>
+  <button onclick="stopCode()">⏹ Stop</button>
+  <button onclick="clearCode()">🧹 Clear</button>
+
+  <input type="text" id="findText" placeholder="Find text">
+  <button onclick="findAll()">🔍 Find</button>
+
+  <input type="text" id="fileName" placeholder="filename" value="myfile">
+  <select id="fileExt">
+    <option value="html">.html</option>
+    <option value="css">.css</option>
+    <option value="js">.js</option>
+    <option value="json">.json</option>
+    <option value="txt">.txt</option>
+  </select>
+  <button onclick="saveFile()">💾 Save</button>
+</div>
+
+<div id="editorContainer">
+  <div id="editor"></div>
+
+  <div id="previewContainer">
+    <div id="previewToolbar">
+      <button onclick="goBack()">◀ Back</button>
+      <button onclick="goForward()">▶ Forward</button>
+      <button onclick="reloadPage()">⟳ Reload</button>
+      <input type="text" id="previewUrl" placeholder="Enter URL">
+      <button onclick="navigateToUrl()">Go</button>
+    </div>
+    <iframe id="preview"></iframe>
+  </div>
+</div>
+
+<script>
+let editor;
+let currentDecorations = [];
+
+require.config({ paths: { 'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs' }});
+require(['vs/editor/editor.main'], function() {
+  editor = monaco.editor.create(document.getElementById('editor'), {
+    value: `<!DOCTYPE html>
+<html>
+<head><title>Hello</title></head>
+<body><h1>Hello World</h1></body>
+</html>`,
+    language: 'html',
+    theme: 'vs-light',
+    automaticLayout: true,
+    fontSize:14
+  });
+
+  editor.onDidPaste(() => { currentDecorations = editor.deltaDecorations(currentDecorations, []); });
+  editor.onDidBlurEditorWidget(() => { currentDecorations = editor.deltaDecorations(currentDecorations, []); });
+});
+
+const preview = document.getElementById('preview');
+
+function runCode(){ 
+  preview.srcdoc = editor.getValue(); 
+  document.getElementById('previewUrl').value = '';
+}
+function stopCode(){ 
+  preview.srcdoc = "<h3 style='text-align:center;margin-top:50px;'>⏹ Preview stopped</h3>"; 
+  document.getElementById('previewUrl').value = '';
+}
+function clearCode(){ editor.setValue(''); currentDecorations = editor.deltaDecorations(currentDecorations, []); }
+
+function saveFile(){
+  const name = document.getElementById("fileName").value.trim()||"myfile";
+  const ext = document.getElementById("fileExt").value;
+  const blob = new Blob([editor.getValue()], {type:"text/plain"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = name + "." + ext;
+  a.click();
+}
+
+// ===== Updated Find Function =====
+function findAll(){
+  const search = document.getElementById("findText").value;
+  if(!search || !editor) return;
+
+  currentDecorations = editor.deltaDecorations(currentDecorations, []);
+  const matches = editor.getModel().findMatches(search,true,false,false,null);
+  const decorations = matches.map(m => ({ range: m.range, options: { inlineClassName: 'myHighlight' } }));
+  currentDecorations = editor.deltaDecorations([], decorations);
+
+  if(matches.length > 0){
+    const firstMatchRange = matches[0].range;
+    editor.revealRangeInCenter(firstMatchRange, monaco.editor.ScrollType.Smooth);
+    editor.setPosition({ lineNumber: firstMatchRange.startLineNumber, column: firstMatchRange.startColumn });
+  }
+}
+
+const style = document.createElement('style');
+style.innerHTML = `.myHighlight { background: yellow; }`;
+document.head.appendChild(style);
+
+document.addEventListener("keydown", e=>{
+  if(e.ctrlKey && e.key==='Enter'){ e.preventDefault(); runCode(); }
+  if(e.ctrlKey && e.key.toLowerCase()==='s'){ e.preventDefault(); saveFile(); }
+  if(e.ctrlKey && e.key.toLowerCase()==='f'){ e.preventDefault(); document.getElementById("findText").focus(); }
+});
+
+document.getElementById("findText").addEventListener("keydown", e=>{
+  if(e.key==='Enter'){ e.preventDefault(); findAll(); }
+});
+
+document.getElementById("fileExt").addEventListener("change", e=>{
+  const ext = e.target.value;
+  let lang = 'plaintext';
+  if(ext==='html'||ext==='htm') lang='html';
+  else if(ext==='css') lang='css';
+  else if(ext==='js') lang='javascript';
+  else if(ext==='json') lang='json';
+  else if(ext==='txt') lang='plaintext';
+  const model = editor.getModel();
+  const newModel = monaco.editor.createModel(model.getValue(), lang);
+  editor.setModel(newModel);
+});
+
+// ===== Browser-like preview navigation =====
+const historyStack = [];
+let historyIndex = -1;
+
+function navigateToUrl(){
+  const url = document.getElementById('previewUrl').value.trim();
+  if(!url) return;
+  const finalUrl = url.startsWith('http') ? url : 'https://' + url;
+  preview.src = finalUrl;
+  historyStack.splice(historyIndex+1);
+  historyStack.push(finalUrl);
+  historyIndex = historyStack.length - 1;
+}
+
+function goBack(){
+  if(historyIndex > 0){
+    historyIndex--;
+    preview.src = historyStack[historyIndex];
+    document.getElementById('previewUrl').value = historyStack[historyIndex];
+  }
+}
+
+function goForward(){
+  if(historyIndex < historyStack.length - 1){
+    historyIndex++;
+    preview.src = historyStack[historyIndex];
+    document.getElementById('previewUrl').value = historyStack[historyIndex];
+  }
+}
+
+function reloadPage(){
+  if(historyIndex >= 0){
+    preview.src = historyStack[historyIndex];
+  } else {
+    preview.contentWindow.location.reload();
+  }
+}
+</script>
+</body>
+</html>
