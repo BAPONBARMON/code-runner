@@ -34,7 +34,8 @@ html,body{
 
 /* ===== BUTTON STYLE ===== */
 .ctrl-btn,
-.find-input{
+.find-input,
+.toggle-btn{
   width:72px;
   height:36px;
   background:#000;
@@ -48,8 +49,11 @@ html,body{
   justify-content:center;
 }
 
+.toggle-btn{ width:90px; }
+
+/* ===== RUN BUTTON ===== */
 .run-btn{
-  width:100%;
+  flex:1;
   height:40px;
   background:#00ff7f;
   color:#000;
@@ -76,16 +80,32 @@ html,body{
 .editor-wrapper{
   flex:1;
   min-height:0;
+  position:relative;
 }
-#editor{
+#editor,
+#mobileEditor{
   width:100%;
   height:100%;
+}
+#mobileEditor{
+  display:none;
+  background:#000;
+  color:#00ff7f;
+  border:none;
+  outline:none;
+  resize:none;
+  padding:10px;
+  font-family:Consolas, monospace;
+  font-size:14px;
+  line-height:1.5;
 }
 
 /* ===== RUN BAR ===== */
 .run-bar{
   padding:8px;
   border-top:1px solid #00ff7f55;
+  display:flex;
+  gap:8px;
 }
 
 /* ===== RUNNER ===== */
@@ -142,12 +162,11 @@ html,body{
   color:#000 !important;
 }
 
-/* ===== FORCE NATIVE SELECTION ===== */
+/* ===== FORCE SELECTION ===== */
 .monaco-editor,
 .monaco-editor *{
   -webkit-user-select:text !important;
   user-select:text !important;
-  -webkit-touch-callout:default !important;
 }
 </style>
 
@@ -168,9 +187,12 @@ html,body{
 
 <div class="editor-wrapper">
   <div id="editor"></div>
+  <textarea id="mobileEditor"></textarea>
 </div>
 
+<!-- RUN BAR -->
 <div class="run-bar">
+  <button class="toggle-btn" id="toggleBtn" onclick="toggleMonaco()">Monaco ON</button>
   <button class="run-btn" onclick="runCode()">Run Code</button>
 </div>
 
@@ -186,11 +208,12 @@ html,body{
 
 <script>
 let editor;
+let monacoEnabled = true;
+const mobileEditor = document.getElementById('mobileEditor');
+const toggleBtn = document.getElementById('toggleBtn');
 
 /* ===== MONACO INIT ===== */
-require.config({
-  paths:{vs:'https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs'}
-});
+require.config({ paths:{vs:'https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs'} });
 
 require(['vs/editor/editor.main'],function(){
   editor = monaco.editor.create(
@@ -206,54 +229,80 @@ require(['vs/editor/editor.main'],function(){
       theme:'vs-dark',
       automaticLayout:true,
       minimap:{enabled:false},
-
-      /* 🔥 DISABLE MONACO MENU */
-      contextmenu:false,
-      quickSuggestions:false,
-      parameterHints:{enabled:false}
+      contextmenu:false
     }
   );
 });
 
-/* ===== BLOCK MONACO CONTEXT MENU ===== */
-document.addEventListener('contextmenu',e=>{
-  if(e.target.closest('.monaco-editor')){
-    e.stopPropagation(); // allow native only
-  }
-});
+/* ===== TOGGLE LOGIC ===== */
+function toggleMonaco(){
+  monacoEnabled = !monacoEnabled;
+  toggleBtn.textContent = monacoEnabled ? 'Monaco ON' : 'Monaco OFF';
 
-/* ===== ORIGINAL FUNCTIONS ===== */
-async function pasteCode(){
-  const t = await navigator.clipboard.readText();
-  editor.executeEdits('',[
-    {range:editor.getModel().getFullModelRange(),text:editor.getValue()+t}
-  ]);
+  if(monacoEnabled){
+    document.getElementById('editor').style.display='block';
+    mobileEditor.style.display='none';
+    editor.setValue(mobileEditor.value || editor.getValue());
+  }else{
+    mobileEditor.value = editor.getValue();
+    document.getElementById('editor').style.display='none';
+    mobileEditor.style.display='block';
+    mobileEditor.focus();
+  }
 }
 
+/* ===== HELPERS ===== */
+function getCode(){
+  return monacoEnabled ? editor.getValue() : mobileEditor.value;
+}
+
+/* ===== FUNCTIONS ===== */
+async function pasteCode(){
+  const t = await navigator.clipboard.readText();
+  if(monacoEnabled){
+    editor.executeEdits('',[
+      {range:editor.getModel().getFullModelRange(),text:editor.getValue()+t}
+    ]);
+  }else{
+    mobileEditor.value += t;
+  }
+}
+
+/* ✅ FIXED CLEAR (UNDO SAFE) */
 function clearCode(){
-  editor.pushUndoStop();
-  editor.executeEdits('',[
-    {range:editor.getModel().getFullModelRange(),text:''}
-  ]);
-  editor.pushUndoStop();
+  if(monacoEnabled){
+    editor.pushUndoStop();
+    editor.executeEdits('',[
+      { range: editor.getModel().getFullModelRange(), text: '' }
+    ]);
+    editor.pushUndoStop();
+  }else{
+    mobileEditor.value = '';
+  }
 }
 
 function copyAllCode(){
-  navigator.clipboard.writeText(editor.getValue());
+  navigator.clipboard.writeText(getCode());
   copyToast.classList.add('show');
   setTimeout(()=>copyToast.classList.remove('show'),1000);
 }
 
-function undoCode(){ editor.trigger('keyboard','undo'); }
-function redoCode(){ editor.trigger('keyboard','redo'); }
+function undoCode(){
+  if(monacoEnabled) editor.trigger('keyboard','undo');
+}
+
+function redoCode(){
+  if(monacoEnabled) editor.trigger('keyboard','redo');
+}
 
 function findText(q){
-  if(!q) return;
-  editor.trigger('keyboard','actions.find',{searchString:q});
+  if(q && monacoEnabled){
+    editor.trigger('keyboard','actions.find',{searchString:q});
+  }
 }
 
 function runCode(){
-  output.srcdoc = editor.getValue();
+  output.srcdoc = getCode();
   runner.style.display='flex';
 }
 function refreshRun(){ output.srcdoc = output.srcdoc; }
@@ -261,12 +310,8 @@ function closeRun(){ runner.style.display='none'; }
 
 /* ===== BUTTON GLOW ===== */
 document.querySelectorAll('button').forEach(btn=>{
-  btn.addEventListener('touchstart',()=>{
-    btn.classList.add('btn-pressed');
-  },{passive:true});
-  btn.addEventListener('touchend',()=>{
-    setTimeout(()=>btn.classList.remove('btn-pressed'),120);
-  });
+  btn.addEventListener('touchstart',()=>btn.classList.add('btn-pressed'),{passive:true});
+  btn.addEventListener('touchend',()=>setTimeout(()=>btn.classList.remove('btn-pressed'),120));
 });
 </script>
 
