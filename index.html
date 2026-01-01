@@ -30,6 +30,8 @@ html,body{
   justify-content:center;
   align-items:center;
   border-bottom:1px solid #00ff7f55;
+  background:#000;
+  z-index:10;
 }
 
 /* ===== BUTTON STYLE ===== */
@@ -48,10 +50,8 @@ html,body{
   align-items:center;
   justify-content:center;
 }
-
 .toggle-btn{ width:90px; }
 
-/* ===== RUN BUTTON ===== */
 .run-btn{
   flex:1;
   height:40px;
@@ -76,19 +76,42 @@ html,body{
 }
 .find-input:focus::placeholder{color:transparent}
 
-/* ===== EDITOR ===== */
+/* ===== EDITOR WRAPPER ===== */
 .editor-wrapper{
   flex:1;
   min-height:0;
   position:relative;
+  padding-bottom:72px; /* space for fixed run bar */
 }
-#editor,
-#mobileEditor{
+
+/* ===== MONACO ===== */
+#editor{
   width:100%;
   height:100%;
 }
-#mobileEditor{
+
+/* ===== MONACO OFF (TEXTAREA + LINE NUMBERS) ===== */
+#plainEditor{
   display:none;
+  height:100%;
+  display:flex;
+  background:#000;
+}
+
+#lineNumbers{
+  width:48px;
+  padding:10px 6px;
+  text-align:right;
+  color:#00ff7f66;
+  font-size:14px;
+  line-height:1.6;
+  user-select:none;
+  overflow:hidden;
+  border-right:1px solid #00ff7f33;
+}
+
+#mobileEditor{
+  flex:1;
   background:#000;
   color:#00ff7f;
   border:none;
@@ -97,15 +120,23 @@ html,body{
   padding:10px;
   font-family:Consolas, monospace;
   font-size:14px;
-  line-height:1.5;
+  line-height:1.6;
+  caret-color:#00ff7f;
+  overflow:auto;
 }
 
-/* ===== RUN BAR ===== */
+/* ===== RUN BAR (FIXED) ===== */
 .run-bar{
+  position:fixed;
+  bottom:0;
+  left:0;
+  width:100%;
   padding:8px;
   border-top:1px solid #00ff7f55;
   display:flex;
   gap:8px;
+  background:#000;
+  z-index:1000;
 }
 
 /* ===== RUNNER ===== */
@@ -161,13 +192,6 @@ html,body{
   background:#ffeb3b !important;
   color:#000 !important;
 }
-
-/* ===== FORCE SELECTION ===== */
-.monaco-editor,
-.monaco-editor *{
-  -webkit-user-select:text !important;
-  user-select:text !important;
-}
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js"></script>
@@ -185,9 +209,14 @@ html,body{
   <input class="find-input" placeholder="Find" oninput="findText(this.value)">
 </div>
 
+<!-- EDITOR -->
 <div class="editor-wrapper">
   <div id="editor"></div>
-  <textarea id="mobileEditor"></textarea>
+
+  <div id="plainEditor">
+    <div id="lineNumbers"></div>
+    <textarea id="mobileEditor"></textarea>
+  </div>
 </div>
 
 <!-- RUN BAR -->
@@ -196,6 +225,7 @@ html,body{
   <button class="run-btn" onclick="runCode()">Run Code</button>
 </div>
 
+<!-- RUNNER -->
 <div id="runner">
   <div class="runner-bar">
     <button class="ctrl-btn" onclick="refreshRun()">Refresh</button>
@@ -209,54 +239,82 @@ html,body{
 <script>
 let editor;
 let monacoEnabled = true;
+let cursorOffset = 0;
+
 const mobileEditor = document.getElementById('mobileEditor');
+const lineNumbers = document.getElementById('lineNumbers');
 const toggleBtn = document.getElementById('toggleBtn');
 
 /* ===== MONACO INIT ===== */
 require.config({ paths:{vs:'https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs'} });
-
 require(['vs/editor/editor.main'],function(){
-  editor = monaco.editor.create(
-    document.getElementById('editor'),
-    {
-      value:`<!DOCTYPE html>
+  editor = monaco.editor.create(document.getElementById('editor'),{
+    value:`<!DOCTYPE html>
 <html>
 <body>
 <h1>Hello World</h1>
 </body>
 </html>`,
-      language:'html',
-      theme:'vs-dark',
-      automaticLayout:true,
-      minimap:{enabled:false},
-      contextmenu:false
+    language:'html',
+    theme:'vs-dark',
+    automaticLayout:true,
+    minimap:{enabled:false},
+    contextmenu:false
+  });
+
+  editor.onDidChangeCursorPosition(()=>{
+    if(monacoEnabled){
+      cursorOffset = editor.getModel().getOffsetAt(editor.getPosition());
     }
-  );
+  });
 });
 
-/* ===== TOGGLE LOGIC ===== */
+/* ===== LINE NUMBERS ===== */
+function updateLineNumbers(){
+  const lines = mobileEditor.value.split('\n').length;
+  let html='';
+  for(let i=1;i<=lines;i++) html += i+'<br>';
+  lineNumbers.innerHTML = html;
+}
+
+mobileEditor.addEventListener('scroll',()=>{
+  lineNumbers.scrollTop = mobileEditor.scrollTop;
+});
+['input','click','keyup','select'].forEach(e=>{
+  mobileEditor.addEventListener(e,()=>{
+    cursorOffset = mobileEditor.selectionStart || 0;
+    updateLineNumbers();
+  });
+});
+
+/* ===== TOGGLE ===== */
 function toggleMonaco(){
   monacoEnabled = !monacoEnabled;
   toggleBtn.textContent = monacoEnabled ? 'Monaco ON' : 'Monaco OFF';
 
   if(monacoEnabled){
+    editor.setValue(mobileEditor.value);
+    const pos = editor.getModel().getPositionAt(cursorOffset);
+    editor.setPosition(pos);
+    editor.focus();
     document.getElementById('editor').style.display='block';
-    mobileEditor.style.display='none';
-    editor.setValue(mobileEditor.value || editor.getValue());
+    document.getElementById('plainEditor').style.display='none';
   }else{
     mobileEditor.value = editor.getValue();
+    updateLineNumbers();
     document.getElementById('editor').style.display='none';
-    mobileEditor.style.display='block';
+    document.getElementById('plainEditor').style.display='flex';
     mobileEditor.focus();
+    mobileEditor.setSelectionRange(cursorOffset,cursorOffset);
   }
 }
 
-/* ===== HELPERS ===== */
+/* ===== COMMON ===== */
 function getCode(){
   return monacoEnabled ? editor.getValue() : mobileEditor.value;
 }
 
-/* ===== FUNCTIONS ===== */
+/* ===== ACTIONS ===== */
 async function pasteCode(){
   const t = await navigator.clipboard.readText();
   if(monacoEnabled){
@@ -264,20 +322,23 @@ async function pasteCode(){
       {range:editor.getModel().getFullModelRange(),text:editor.getValue()+t}
     ]);
   }else{
-    mobileEditor.value += t;
+    mobileEditor.setRangeText(t,cursorOffset,cursorOffset,'end');
+    updateLineNumbers();
   }
 }
 
-/* ✅ FIXED CLEAR (UNDO SAFE) */
 function clearCode(){
   if(monacoEnabled){
     editor.pushUndoStop();
     editor.executeEdits('',[
-      { range: editor.getModel().getFullModelRange(), text: '' }
+      {range:editor.getModel().getFullModelRange(),text:''}
     ]);
     editor.pushUndoStop();
+    cursorOffset=0;
   }else{
-    mobileEditor.value = '';
+    mobileEditor.value='';
+    updateLineNumbers();
+    cursorOffset=0;
   }
 }
 
@@ -287,19 +348,9 @@ function copyAllCode(){
   setTimeout(()=>copyToast.classList.remove('show'),1000);
 }
 
-function undoCode(){
-  if(monacoEnabled) editor.trigger('keyboard','undo');
-}
-
-function redoCode(){
-  if(monacoEnabled) editor.trigger('keyboard','redo');
-}
-
-function findText(q){
-  if(q && monacoEnabled){
-    editor.trigger('keyboard','actions.find',{searchString:q});
-  }
-}
+function undoCode(){ if(monacoEnabled) editor.trigger('keyboard','undo'); }
+function redoCode(){ if(monacoEnabled) editor.trigger('keyboard','redo'); }
+function findText(q){ if(q && monacoEnabled) editor.trigger('keyboard','actions.find',{searchString:q}); }
 
 function runCode(){
   output.srcdoc = getCode();
