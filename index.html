@@ -111,29 +111,28 @@ html, body{
   overflow: auto;
 }
 
-/* ===== RUN BAR (FORCE SINGLE LINE FOR MOBILE) ===== */
+/* ===== RUN BAR ===== */
 .run-bar{
   position: fixed !important;
   bottom: 0 !important;
   left: 0 !important;
   width: 100% !important;
   height: 48px !important;
-  padding: 0 6px !important;
+  padding: 0 12px !important; /* Slight padding to keep buttons balanced */
   border-top: 1px solid #00ff7f33;
   display: flex !important;
   align-items: center !important;
-  justify-content: space-between !important;
-  gap: 4px !important;
+  justify-content: center !important; /* Centered layout */
+  gap: 8px !important;
   background: #121216 !important;
   z-index: 1000 !important;
-  flex-wrap: nowrap !important; /* Force no wrap */
+  flex-wrap: nowrap !important;
 }
 
 .run-bar-center {
   display: flex !important;
   align-items: center !important;
-  gap: 3px !important;
-  flex: 1 !important;
+  gap: 4px !important;
   justify-content: center !important;
   min-width: 0 !important;
 }
@@ -165,7 +164,7 @@ html, body{
 }
 
 .custom-ext-wrapper {
-  display: none; /* hidden by default */
+  display: none;
   align-items: center;
   gap: 2px;
 }
@@ -195,7 +194,7 @@ html, body{
 
 .toggle-btn{
   height: 32px !important;
-  padding: 0 6px !important;
+  padding: 0 8px !important;
   background: #1a1a24;
   color: #00ff7f;
   border: 1px solid #00ff7f88;
@@ -227,6 +226,20 @@ html, body{
   box-shadow: 0 0 8px rgba(0,255,127,0.3);
   white-space: nowrap;
   flex-shrink: 0 !important;
+}
+
+/* ===== FIX FOR MOBILE FIND MATCH COUNTER ===== */
+.monaco-editor .find-widget {
+  min-width: 280px !important; /* Ensures enough width for "1 of X" */
+  max-width: 95vw !important;
+  right: 10px !important;
+}
+
+.monaco-editor .find-widget .matchesCount {
+  display: inline-block !important;
+  visibility: visible !important;
+  min-width: 45px !important;
+  font-size: 11px !important;
 }
 
 /* ===== RUNNER & FLOATING BUTTONS ===== */
@@ -338,7 +351,7 @@ html, body{
   </div>
 </div>
 
-<!-- RUN BAR (STRICT SINGLE LINE) -->
+<!-- RUN BAR -->
 <div class="run-bar">
   <button class="toggle-btn" id="toggleBtn" onclick="toggleMonaco()">M-ON</button>
   
@@ -356,7 +369,7 @@ html, body{
       <option value="other">Other...</option>
     </select>
 
-    <!-- CUSTOM EXTENSION INPUT (HIDES DROPDOWN) -->
+    <!-- CUSTOM EXTENSION INPUT -->
     <div id="customExtWrapper" class="custom-ext-wrapper">
       <input type="text" id="customExt" class="custom-ext-input" placeholder=".ext">
       <button class="back-ext-btn" onclick="resetExtDropdown()">✕</button>
