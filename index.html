@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Code Runner</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
 <style>
 *{
@@ -26,8 +26,8 @@ html, body{
 /* ===== TOOLBAR ===== */
 .toolbar{
   display: flex;
-  gap: 6px;
-  padding: 8px 10px;
+  gap: 4px;
+  padding: 6px 4px;
   justify-content: center;
   align-items: center;
   border-bottom: 1px solid #00ff7f33;
@@ -38,27 +38,25 @@ html, body{
 
 /* ===== BUTTON STYLE ===== */
 .ctrl-btn{
-  height: 32px;
-  padding: 0 12px;
+  height: 28px;
+  padding: 0 8px;
   background: #1a1a24;
   color: #00ff7f;
   border: 1px solid #00ff7f88;
   border-radius: 6px;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.5);
   line-height: 1;
 }
 
 .ctrl-btn:hover{
   background: #00ff7f;
   color: #000;
-  box-shadow: 0 0 10px #00ff7f88;
 }
 
 .ctrl-btn:active, .btn-pressed{
@@ -70,7 +68,7 @@ html, body{
   flex: 1;
   min-height: 0;
   position: relative;
-  padding-bottom: 60px; /* space for fixed run bar */
+  padding-bottom: 48px; /* space for run bar */
 }
 
 /* ===== MONACO ===== */
@@ -87,11 +85,11 @@ html, body{
 }
 
 #lineNumbers{
-  width: 40px;
-  padding: 10px 4px;
+  width: 35px;
+  padding: 10px 2px;
   text-align: right;
   color: #00ff7f66;
-  font-size: 13px;
+  font-size: 12px;
   line-height: 1.6;
   user-select: none;
   overflow: hidden;
@@ -105,7 +103,7 @@ html, body{
   border: none;
   outline: none;
   resize: none;
-  padding: 10px;
+  padding: 8px;
   font-family: Consolas, monospace;
   font-size: 13px;
   line-height: 1.6;
@@ -113,117 +111,125 @@ html, body{
   overflow: auto;
 }
 
-/* ===== RUN BAR (FIXED) ===== */
+/* ===== RUN BAR (FORCE SINGLE LINE FOR MOBILE) ===== */
 .run-bar{
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  padding: 8px 12px;
+  position: fixed !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 48px !important;
+  padding: 0 6px !important;
   border-top: 1px solid #00ff7f33;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  background: #121216;
-  z-index: 1000;
-  flex-wrap: wrap;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 4px !important;
+  background: #121216 !important;
+  z-index: 1000 !important;
+  flex-wrap: nowrap !important; /* Force no wrap */
 }
 
 .run-bar-center {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex: 1;
-  justify-content: center;
+  display: flex !important;
+  align-items: center !important;
+  gap: 3px !important;
+  flex: 1 !important;
+  justify-content: center !important;
+  min-width: 0 !important;
 }
 
-/* LARGER SAVE INPUTS */
+/* UNIFORM HEIGHT (32px) */
 .save-input{
-  height: 36px;
+  height: 32px !important;
   background: #1a1a24;
   border: 1px solid #00ff7f66;
   color: #00ff7f;
   border-radius: 6px;
-  padding: 0 10px;
-  font-size: 13px;
+  padding: 0 6px;
+  font-size: 11px;
   outline: none;
-  width: 120px;
-}
-.save-input:focus{
-  border-color: #00ff7f;
+  width: 65px !important;
+  min-width: 45px !important;
 }
 
 .ext-select{
-  height: 36px;
+  height: 32px !important;
   background: #1a1a24;
   border: 1px solid #00ff7f66;
   color: #00ff7f;
   border-radius: 6px;
-  padding: 0 8px;
-  font-size: 13px;
+  padding: 0 2px;
+  font-size: 11px;
   outline: none;
   cursor: pointer;
 }
 
+.custom-ext-wrapper {
+  display: none; /* hidden by default */
+  align-items: center;
+  gap: 2px;
+}
+
 .custom-ext-input {
-  height: 36px;
+  height: 32px !important;
   background: #1a1a24;
   border: 1px solid #00ff7f66;
   color: #00ff7f;
   border-radius: 6px;
-  padding: 0 8px;
-  font-size: 13px;
+  padding: 0 4px;
+  font-size: 11px;
   outline: none;
-  width: 70px;
-  display: none; /* hidden by default */
+  width: 45px !important;
+}
+
+.back-ext-btn {
+  height: 32px !important;
+  padding: 0 5px;
+  background: #2a1a1a;
+  color: #ff5555;
+  border: 1px solid #ff555588;
+  border-radius: 6px;
+  font-size: 10px;
+  cursor: pointer;
 }
 
 .toggle-btn{
-  height: 36px;
-  padding: 0 12px;
+  height: 32px !important;
+  padding: 0 6px !important;
   background: #1a1a24;
   color: #00ff7f;
   border: 1px solid #00ff7f88;
   border-radius: 6px;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  white-space: nowrap;
+  flex-shrink: 0 !important;
 }
 
 .save-btn{
-  height: 36px;
-  padding: 0 16px;
-  font-size: 13px;
+  height: 32px !important;
+  padding: 0 8px !important;
+  font-size: 11px;
+  flex-shrink: 0 !important;
 }
 
 .run-btn{
-  height: 38px;
-  padding: 0 18px;
+  height: 32px !important;
+  padding: 0 12px !important;
   background: linear-gradient(135deg, #00ff7f, #00b359);
   color: #000;
   border: none;
-  border-radius: 8px;
-  font-size: 13px;
+  border-radius: 6px;
+  font-size: 11px;
   font-weight: 900;
   cursor: pointer;
-  box-shadow: 0 0 10px rgba(0,255,127,0.3);
-  transition: all 0.2s;
-  margin-left: auto; /* Push to right */
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  box-shadow: 0 0 8px rgba(0,255,127,0.3);
+  white-space: nowrap;
+  flex-shrink: 0 !important;
 }
 
-.run-btn:hover{
-  box-shadow: 0 0 15px #00ff7f;
-  transform: scale(1.02);
-}
-
-/* ===== RUNNER & NEW FLOATING BUTTONS LOOK ===== */
+/* ===== RUNNER & FLOATING BUTTONS ===== */
 #runner{
   position: fixed;
   inset: 0;
@@ -232,64 +238,36 @@ html, body{
   z-index: 9999;
 }
 
-/* FLOATING BAR CONTAINER */
 .floating-bar{
   position: absolute;
-  top: 14px;
-  right: 14px;
+  top: 12px;
+  right: 12px;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   z-index: 10000;
 }
 
-/* NEW DYNAMIC FLOATING BUTTON LOOK */
 .float-btn{
-  height: 38px;
-  padding: 0 18px;
-  background: rgba(10, 10, 15, 0.75);
+  height: 34px;
+  padding: 0 14px;
+  background: rgba(10, 10, 15, 0.8);
   color: #00ff7f;
   border: 1px solid rgba(0, 255, 127, 0.4);
-  border-radius: 30px;
-  font-size: 12px;
+  border-radius: 20px;
+  font-size: 11px;
   font-weight: 800;
-  font-family: system-ui, -apple-system, sans-serif;
-  letter-spacing: 0.5px;
   cursor: pointer;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.1);
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  line-height: 1;
 }
 
-.float-btn:hover{
-  background: #00ff7f;
-  color: #050508;
-  border-color: #00ff7f;
-  box-shadow: 0 0 18px rgba(0, 255, 127, 0.6);
-  transform: translateY(-2px);
-}
-
-.float-btn:active{
-  transform: translateY(0) scale(0.96);
-}
-
-/* CLOSE BUTTON SPECIFIC LOOK */
 .float-close{
   color: #ff5555;
   border-color: rgba(255, 85, 85, 0.4);
-}
-
-.float-close:hover{
-  background: #ff3333;
-  color: #ffffff;
-  border-color: #ff3333;
-  box-shadow: 0 0 18px rgba(255, 51, 51, 0.6);
 }
 
 #output{
@@ -315,15 +293,14 @@ html, body{
 #copyToast span{
   background: #00ff7f;
   color: #000;
-  padding: 12px 24px;
-  border-radius: 12px;
+  padding: 10px 20px;
+  border-radius: 10px;
   font-weight: 900;
-  font-size: 13px;
-  box-shadow: 0 0 20px #00ff7f88;
+  font-size: 12px;
 }
 #copyToast.show{opacity: 1;}
 
-/* ===== VERY LIGHT TRANSPARENT YELLOW FIND HIGHLIGHT ===== */
+/* ===== LIGHT TRANSPARENT YELLOW FIND HIGHLIGHT ===== */
 .monaco-editor .findMatch {
   background-color: rgba(255, 235, 59, 0.35) !important;
   color: inherit !important;
@@ -333,15 +310,6 @@ html, body{
   background-color: rgba(255, 215, 0, 0.65) !important;
   color: #000 !important;
   font-weight: bold;
-}
-
-/* ===== RESPONSIVE MOBILE FIXES ===== */
-@media (max-width: 600px) {
-  .save-input { width: 80px; font-size: 11px; }
-  .ext-select { font-size: 11px; }
-  .run-bar { padding: 6px; }
-  .ctrl-btn { height: 30px; padding: 0 8px; font-size: 11px; }
-  .float-btn { height: 34px; padding: 0 14px; font-size: 11px; }
 }
 </style>
 
@@ -370,14 +338,15 @@ html, body{
   </div>
 </div>
 
-<!-- RUN BAR -->
+<!-- RUN BAR (STRICT SINGLE LINE) -->
 <div class="run-bar">
-  <button class="toggle-btn" id="toggleBtn" onclick="toggleMonaco()">Monaco ON</button>
+  <button class="toggle-btn" id="toggleBtn" onclick="toggleMonaco()">M-ON</button>
   
   <!-- SAVE FILE SECTION -->
   <div class="run-bar-center">
-    <input type="text" id="fileName" class="save-input" placeholder="filename" value="index">
+    <input type="text" id="fileName" class="save-input" placeholder="file" value="index">
     
+    <!-- DROPDOWN -->
     <select id="fileExt" class="ext-select" onchange="checkCustomExt(this.value)">
       <option value=".html">.html</option>
       <option value=".css">.css</option>
@@ -387,7 +356,11 @@ html, body{
       <option value="other">Other...</option>
     </select>
 
-    <input type="text" id="customExt" class="custom-ext-input" placeholder=".ext">
+    <!-- CUSTOM EXTENSION INPUT (HIDES DROPDOWN) -->
+    <div id="customExtWrapper" class="custom-ext-wrapper">
+      <input type="text" id="customExt" class="custom-ext-input" placeholder=".ext">
+      <button class="back-ext-btn" onclick="resetExtDropdown()">✕</button>
+    </div>
 
     <button class="ctrl-btn save-btn" onclick="saveToFile()">Save</button>
   </div>
@@ -395,7 +368,7 @@ html, body{
   <button class="run-btn" onclick="runCode()">Run Code ►</button>
 </div>
 
-<!-- RUNNER WITH NEW FLOATING BUTTONS LOOK -->
+<!-- RUNNER -->
 <div id="runner">
   <div class="floating-bar">
     <button class="float-btn" onclick="refreshRun()">↻ Refresh</button>
@@ -423,17 +396,13 @@ require(['vs/editor/editor.main'], function(){
 <html>
 <head>
   <style>
-    body { 
-      font-family: sans-serif; 
-      padding: 20px; 
-      color: #333;
-    }
+    body { font-family: sans-serif; padding: 20px; color: #333; }
     h1 { color: #00b359; }
   </style>
 </head>
 <body>
   <h1>Hello World</h1>
-  <p>This is your real page preview without any forced styles!</p>
+  <p>Real page preview!</p>
 </body>
 </html>`,
     language: 'html',
@@ -448,6 +417,8 @@ require(['vs/editor/editor.main'], function(){
       cursorOffset = editor.getModel().getOffsetAt(editor.getPosition());
     }
   });
+
+  updateToggleText();
 });
 
 /* ===== LINE NUMBERS ===== */
@@ -469,9 +440,20 @@ mobileEditor.addEventListener('scroll', () => {
 });
 
 /* ===== TOGGLE MONACO ===== */
+function updateToggleText(){
+  const isMobile = window.innerWidth <= 600;
+  if(monacoEnabled){
+    toggleBtn.textContent = isMobile ? 'M-ON' : 'Monaco ON';
+  } else {
+    toggleBtn.textContent = isMobile ? 'M-OFF' : 'Monaco OFF';
+  }
+}
+
+window.addEventListener('resize', updateToggleText);
+
 function toggleMonaco(){
   monacoEnabled = !monacoEnabled;
-  toggleBtn.textContent = monacoEnabled ? 'Monaco ON' : 'Monaco OFF';
+  updateToggleText();
 
   if(monacoEnabled){
     editor.setValue(mobileEditor.value);
@@ -546,25 +528,37 @@ function triggerFind(){
   }
 }
 
-/* ===== CUSTOM EXTENSION TOGGLE ===== */
+/* ===== CUSTOM EXTENSION LOGIC ===== */
 function checkCustomExt(val){
+  const fileExtSelect = document.getElementById('fileExt');
+  const customWrapper = document.getElementById('customExtWrapper');
   const customInput = document.getElementById('customExt');
+
   if(val === 'other'){
-    customInput.style.display = 'inline-block';
+    fileExtSelect.style.display = 'none';
+    customWrapper.style.display = 'inline-flex';
     customInput.focus();
-  } else {
-    customInput.style.display = 'none';
   }
+}
+
+function resetExtDropdown(){
+  const fileExtSelect = document.getElementById('fileExt');
+  const customWrapper = document.getElementById('customExtWrapper');
+  
+  customWrapper.style.display = 'none';
+  fileExtSelect.style.display = 'inline-block';
+  fileExtSelect.value = '.html';
 }
 
 /* ===== SAVE FILE FUNCTION ===== */
 function saveToFile(){
   const code = getCode();
   const nameInput = document.getElementById('fileName').value.trim() || 'code';
-  const selectVal = document.getElementById('fileExt').value;
+  const fileExtSelect = document.getElementById('fileExt');
   
-  let ext = selectVal;
-  if(selectVal === 'other'){
+  let ext = fileExtSelect.value;
+  
+  if(fileExtSelect.style.display === 'none'){
     let customVal = document.getElementById('customExt').value.trim();
     if(!customVal) customVal = '.txt';
     if(!customVal.startsWith('.')) customVal = '.' + customVal;
