@@ -7,190 +7,341 @@
 
 <style>
 *{
-  box-sizing:border-box;
-  -webkit-tap-highlight-color:transparent;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* ===== PAGE ===== */
-html,body{
-  margin:0;
-  padding:0;
-  height:100dvh;
-  background:#000;
-  font-family:Consolas, monospace;
-  display:flex;
-  flex-direction:column;
+html, body{
+  margin: 0;
+  padding: 0;
+  height: 100dvh;
+  background: #0a0a0c;
+  font-family: Consolas, monospace;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 /* ===== TOOLBAR ===== */
 .toolbar{
-  display:flex;
-  gap:6px;
-  padding:8px;
-  justify-content:center;
-  align-items:center;
-  border-bottom:1px solid #00ff7f55;
-  background:#000;
-  z-index:10;
+  display: flex;
+  gap: 6px;
+  padding: 8px 10px;
+  justify-content: center;
+  align-items: center;
+  border-bottom: 1px solid #00ff7f33;
+  background: #121216;
+  z-index: 10;
+  flex-wrap: wrap;
 }
 
 /* ===== BUTTON STYLE ===== */
-.ctrl-btn,
-.find-input,
-.toggle-btn{
-  width:72px;
-  height:36px;
-  background:#000;
-  color:#00ff7f;
-  border:2px solid #00ff7f;
-  border-radius:10px;
-  font-size:13px;
-  font-weight:800;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-.toggle-btn{ width:90px; }
-
-.run-btn{
-  flex:1;
-  height:40px;
-  background:#00ff7f;
-  color:#000;
-  border:none;
-  border-radius:14px;
-  font-size:15px;
-  font-weight:900;
+.ctrl-btn{
+  height: 32px;
+  padding: 0 12px;
+  background: #1a1a24;
+  color: #00ff7f;
+  border: 1px solid #00ff7f88;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  line-height: 1;
 }
 
-/* ===== BUTTON GLOW ===== */
-.btn-pressed{
-  box-shadow:0 0 14px #00ff7f;
-  transform:scale(0.96);
+.ctrl-btn:hover{
+  background: #00ff7f;
+  color: #000;
+  box-shadow: 0 0 10px #00ff7f88;
 }
 
-/* ===== FIND ===== */
-.find-input{
-  outline:none;
-  text-align:center;
+.ctrl-btn:active, .btn-pressed{
+  transform: scale(0.94);
 }
-.find-input:focus::placeholder{color:transparent}
 
 /* ===== EDITOR WRAPPER ===== */
 .editor-wrapper{
-  flex:1;
-  min-height:0;
-  position:relative;
-  padding-bottom:72px; /* space for fixed run bar */
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  padding-bottom: 60px; /* space for fixed run bar */
 }
 
 /* ===== MONACO ===== */
 #editor{
-  width:100%;
-  height:100%;
+  width: 100%;
+  height: 100%;
 }
 
 /* ===== MONACO OFF (TEXTAREA + LINE NUMBERS) ===== */
 #plainEditor{
-  display:none;
-  height:100%;
-  display:flex;
-  background:#000;
+  display: none;
+  height: 100%;
+  background: #0a0a0c;
 }
 
 #lineNumbers{
-  width:48px;
-  padding:10px 6px;
-  text-align:right;
-  color:#00ff7f66;
-  font-size:14px;
-  line-height:1.6;
-  user-select:none;
-  overflow:hidden;
-  border-right:1px solid #00ff7f33;
+  width: 40px;
+  padding: 10px 4px;
+  text-align: right;
+  color: #00ff7f66;
+  font-size: 13px;
+  line-height: 1.6;
+  user-select: none;
+  overflow: hidden;
+  border-right: 1px solid #00ff7f22;
 }
 
 #mobileEditor{
-  flex:1;
-  background:#000;
-  color:#00ff7f;
-  border:none;
-  outline:none;
-  resize:none;
-  padding:10px;
-  font-family:Consolas, monospace;
-  font-size:14px;
-  line-height:1.6;
-  caret-color:#00ff7f;
-  overflow:auto;
+  flex: 1;
+  background: #0a0a0c;
+  color: #00ff7f;
+  border: none;
+  outline: none;
+  resize: none;
+  padding: 10px;
+  font-family: Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  caret-color: #00ff7f;
+  overflow: auto;
 }
 
 /* ===== RUN BAR (FIXED) ===== */
 .run-bar{
-  position:fixed;
-  bottom:0;
-  left:0;
-  width:100%;
-  padding:8px;
-  border-top:1px solid #00ff7f55;
-  display:flex;
-  gap:8px;
-  background:#000;
-  z-index:1000;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 8px 12px;
+  border-top: 1px solid #00ff7f33;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: #121216;
+  z-index: 1000;
+  flex-wrap: wrap;
 }
 
-/* ===== RUNNER ===== */
+.run-bar-center {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  justify-content: center;
+}
+
+/* LARGER SAVE INPUTS */
+.save-input{
+  height: 36px;
+  background: #1a1a24;
+  border: 1px solid #00ff7f66;
+  color: #00ff7f;
+  border-radius: 6px;
+  padding: 0 10px;
+  font-size: 13px;
+  outline: none;
+  width: 120px;
+}
+.save-input:focus{
+  border-color: #00ff7f;
+}
+
+.ext-select{
+  height: 36px;
+  background: #1a1a24;
+  border: 1px solid #00ff7f66;
+  color: #00ff7f;
+  border-radius: 6px;
+  padding: 0 8px;
+  font-size: 13px;
+  outline: none;
+  cursor: pointer;
+}
+
+.custom-ext-input {
+  height: 36px;
+  background: #1a1a24;
+  border: 1px solid #00ff7f66;
+  color: #00ff7f;
+  border-radius: 6px;
+  padding: 0 8px;
+  font-size: 13px;
+  outline: none;
+  width: 70px;
+  display: none; /* hidden by default */
+}
+
+.toggle-btn{
+  height: 36px;
+  padding: 0 12px;
+  background: #1a1a24;
+  color: #00ff7f;
+  border: 1px solid #00ff7f88;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.save-btn{
+  height: 36px;
+  padding: 0 16px;
+  font-size: 13px;
+}
+
+.run-btn{
+  height: 38px;
+  padding: 0 18px;
+  background: linear-gradient(135deg, #00ff7f, #00b359);
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(0,255,127,0.3);
+  transition: all 0.2s;
+  margin-left: auto; /* Push to right */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.run-btn:hover{
+  box-shadow: 0 0 15px #00ff7f;
+  transform: scale(1.02);
+}
+
+/* ===== RUNNER & NEW FLOATING BUTTONS LOOK ===== */
 #runner{
-  position:fixed;
-  inset:0;
-  background:#000;
-  display:none;
-  flex-direction:column;
-  z-index:9999;
+  position: fixed;
+  inset: 0;
+  background: #fff;
+  display: none;
+  z-index: 9999;
 }
-.runner-bar{
-  display:flex;
-  justify-content:center;
-  gap:8px;
-  padding:6px;
-  background:#050505;
-  border-bottom:2px solid #00ff7f88;
+
+/* FLOATING BAR CONTAINER */
+.floating-bar{
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 10000;
 }
+
+/* NEW DYNAMIC FLOATING BUTTON LOOK */
+.float-btn{
+  height: 38px;
+  padding: 0 18px;
+  background: rgba(10, 10, 15, 0.75);
+  color: #00ff7f;
+  border: 1px solid rgba(0, 255, 127, 0.4);
+  border-radius: 30px;
+  font-size: 12px;
+  font-weight: 800;
+  font-family: system-ui, -apple-system, sans-serif;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  line-height: 1;
+}
+
+.float-btn:hover{
+  background: #00ff7f;
+  color: #050508;
+  border-color: #00ff7f;
+  box-shadow: 0 0 18px rgba(0, 255, 127, 0.6);
+  transform: translateY(-2px);
+}
+
+.float-btn:active{
+  transform: translateY(0) scale(0.96);
+}
+
+/* CLOSE BUTTON SPECIFIC LOOK */
+.float-close{
+  color: #ff5555;
+  border-color: rgba(255, 85, 85, 0.4);
+}
+
+.float-close:hover{
+  background: #ff3333;
+  color: #ffffff;
+  border-color: #ff3333;
+  box-shadow: 0 0 18px rgba(255, 51, 51, 0.6);
+}
+
 #output{
-  flex:1;
-  border:none;
-  background:#fff;
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: #fff;
 }
 
 /* ===== COPY TOAST ===== */
 #copyToast{
-  position:fixed;
-  inset:0;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  background:#00000088;
-  opacity:0;
-  pointer-events:none;
-  transition:.25s;
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0,0,0,0.6);
+  opacity: 0;
+  pointer-events: none;
+  transition: .25s;
+  z-index: 10001;
 }
 #copyToast span{
-  background:#00ff7f;
-  color:#000;
-  padding:16px 28px;
-  border-radius:16px;
-  font-weight:900;
+  background: #00ff7f;
+  color: #000;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-weight: 900;
+  font-size: 13px;
+  box-shadow: 0 0 20px #00ff7f88;
 }
-#copyToast.show{opacity:1}
+#copyToast.show{opacity: 1;}
 
-/* ===== FIND HIGHLIGHT ===== */
-.monaco-editor .findMatch{
-  background:#ffff00 !important;
-  color:#000 !important;
+/* ===== VERY LIGHT TRANSPARENT YELLOW FIND HIGHLIGHT ===== */
+.monaco-editor .findMatch {
+  background-color: rgba(255, 235, 59, 0.35) !important;
+  color: inherit !important;
+  border: 1px solid rgba(255, 235, 59, 0.8);
 }
-.monaco-editor .currentFindMatch{
-  background:#ffeb3b !important;
-  color:#000 !important;
+.monaco-editor .currentFindMatch {
+  background-color: rgba(255, 215, 0, 0.65) !important;
+  color: #000 !important;
+  font-weight: bold;
+}
+
+/* ===== RESPONSIVE MOBILE FIXES ===== */
+@media (max-width: 600px) {
+  .save-input { width: 80px; font-size: 11px; }
+  .ext-select { font-size: 11px; }
+  .run-bar { padding: 6px; }
+  .ctrl-btn { height: 30px; padding: 0 8px; font-size: 11px; }
+  .float-btn { height: 34px; padding: 0 14px; font-size: 11px; }
 }
 </style>
 
@@ -206,7 +357,7 @@ html,body{
   <button class="ctrl-btn" onclick="copyAllCode()">Copy</button>
   <button class="ctrl-btn" onclick="undoCode()">Undo</button>
   <button class="ctrl-btn" onclick="redoCode()">Redo</button>
-  <input class="find-input" placeholder="Find" oninput="findText(this.value)">
+  <button class="ctrl-btn" onclick="triggerFind()">Find</button>
 </div>
 
 <!-- EDITOR -->
@@ -222,19 +373,38 @@ html,body{
 <!-- RUN BAR -->
 <div class="run-bar">
   <button class="toggle-btn" id="toggleBtn" onclick="toggleMonaco()">Monaco ON</button>
-  <button class="run-btn" onclick="runCode()">Run Code</button>
+  
+  <!-- SAVE FILE SECTION -->
+  <div class="run-bar-center">
+    <input type="text" id="fileName" class="save-input" placeholder="filename" value="index">
+    
+    <select id="fileExt" class="ext-select" onchange="checkCustomExt(this.value)">
+      <option value=".html">.html</option>
+      <option value=".css">.css</option>
+      <option value=".js">.js</option>
+      <option value=".json">.json</option>
+      <option value=".txt">.txt</option>
+      <option value="other">Other...</option>
+    </select>
+
+    <input type="text" id="customExt" class="custom-ext-input" placeholder=".ext">
+
+    <button class="ctrl-btn save-btn" onclick="saveToFile()">Save</button>
+  </div>
+
+  <button class="run-btn" onclick="runCode()">Run Code ►</button>
 </div>
 
-<!-- RUNNER -->
+<!-- RUNNER WITH NEW FLOATING BUTTONS LOOK -->
 <div id="runner">
-  <div class="runner-bar">
-    <button class="ctrl-btn" onclick="refreshRun()">Refresh</button>
-    <button class="ctrl-btn" onclick="closeRun()">Close</button>
+  <div class="floating-bar">
+    <button class="float-btn" onclick="refreshRun()">↻ Refresh</button>
+    <button class="float-btn float-close" onclick="closeRun()">✕ Close</button>
   </div>
   <iframe id="output"></iframe>
 </div>
 
-<div id="copyToast"><span>Copy Successfully</span></div>
+<div id="copyToast"><span>Copied Successfully!</span></div>
 
 <script>
 let editor;
@@ -247,22 +417,33 @@ const toggleBtn = document.getElementById('toggleBtn');
 
 /* ===== MONACO INIT ===== */
 require.config({ paths:{vs:'https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs'} });
-require(['vs/editor/editor.main'],function(){
-  editor = monaco.editor.create(document.getElementById('editor'),{
-    value:`<!DOCTYPE html>
+require(['vs/editor/editor.main'], function(){
+  editor = monaco.editor.create(document.getElementById('editor'), {
+    value: `<!DOCTYPE html>
 <html>
+<head>
+  <style>
+    body { 
+      font-family: sans-serif; 
+      padding: 20px; 
+      color: #333;
+    }
+    h1 { color: #00b359; }
+  </style>
+</head>
 <body>
-<h1>Hello World</h1>
+  <h1>Hello World</h1>
+  <p>This is your real page preview without any forced styles!</p>
 </body>
 </html>`,
-    language:'html',
-    theme:'vs-dark',
-    automaticLayout:true,
-    minimap:{enabled:false},
-    contextmenu:false
+    language: 'html',
+    theme: 'vs-dark',
+    automaticLayout: true,
+    minimap: { enabled: false },
+    contextmenu: false
   });
 
-  editor.onDidChangeCursorPosition(()=>{
+  editor.onDidChangeCursorPosition(() => {
     if(monacoEnabled){
       cursorOffset = editor.getModel().getOffsetAt(editor.getPosition());
     }
@@ -272,22 +453,22 @@ require(['vs/editor/editor.main'],function(){
 /* ===== LINE NUMBERS ===== */
 function updateLineNumbers(){
   const lines = mobileEditor.value.split('\n').length;
-  let html='';
-  for(let i=1;i<=lines;i++) html += i+'<br>';
+  let html = '';
+  for(let i=1; i<=lines; i++) html += i + '<br>';
   lineNumbers.innerHTML = html;
 }
 
-mobileEditor.addEventListener('scroll',()=>{
+mobileEditor.addEventListener('scroll', () => {
   lineNumbers.scrollTop = mobileEditor.scrollTop;
 });
-['input','click','keyup','select'].forEach(e=>{
-  mobileEditor.addEventListener(e,()=>{
+['input','click','keyup','select'].forEach(e => {
+  mobileEditor.addEventListener(e, () => {
     cursorOffset = mobileEditor.selectionStart || 0;
     updateLineNumbers();
   });
 });
 
-/* ===== TOGGLE ===== */
+/* ===== TOGGLE MONACO ===== */
 function toggleMonaco(){
   monacoEnabled = !monacoEnabled;
   toggleBtn.textContent = monacoEnabled ? 'Monaco ON' : 'Monaco OFF';
@@ -297,72 +478,130 @@ function toggleMonaco(){
     const pos = editor.getModel().getPositionAt(cursorOffset);
     editor.setPosition(pos);
     editor.focus();
-    document.getElementById('editor').style.display='block';
-    document.getElementById('plainEditor').style.display='none';
-  }else{
+    document.getElementById('editor').style.display = 'block';
+    document.getElementById('plainEditor').style.display = 'none';
+  } else {
     mobileEditor.value = editor.getValue();
     updateLineNumbers();
-    document.getElementById('editor').style.display='none';
-    document.getElementById('plainEditor').style.display='flex';
+    document.getElementById('editor').style.display = 'none';
+    document.getElementById('plainEditor').style.display = 'flex';
     mobileEditor.focus();
-    mobileEditor.setSelectionRange(cursorOffset,cursorOffset);
+    mobileEditor.setSelectionRange(cursorOffset, cursorOffset);
   }
 }
 
-/* ===== COMMON ===== */
+/* ===== GET CODE ===== */
 function getCode(){
   return monacoEnabled ? editor.getValue() : mobileEditor.value;
 }
 
 /* ===== ACTIONS ===== */
 async function pasteCode(){
-  const t = await navigator.clipboard.readText();
-  if(monacoEnabled){
-    editor.executeEdits('',[
-      {range:editor.getModel().getFullModelRange(),text:editor.getValue()+t}
-    ]);
-  }else{
-    mobileEditor.setRangeText(t,cursorOffset,cursorOffset,'end');
-    updateLineNumbers();
+  try {
+    const t = await navigator.clipboard.readText();
+    if(monacoEnabled){
+      editor.executeEdits('', [
+        { range: editor.getModel().getFullModelRange(), text: editor.getValue() + t }
+      ]);
+    } else {
+      mobileEditor.setRangeText(t, cursorOffset, cursorOffset, 'end');
+      updateLineNumbers();
+    }
+  } catch(err) {
+    alert('Clipboard read access denied.');
   }
 }
 
 function clearCode(){
   if(monacoEnabled){
     editor.pushUndoStop();
-    editor.executeEdits('',[
-      {range:editor.getModel().getFullModelRange(),text:''}
+    editor.executeEdits('', [
+      { range: editor.getModel().getFullModelRange(), text: '' }
     ]);
     editor.pushUndoStop();
-    cursorOffset=0;
-  }else{
-    mobileEditor.value='';
+    cursorOffset = 0;
+  } else {
+    mobileEditor.value = '';
     updateLineNumbers();
-    cursorOffset=0;
+    cursorOffset = 0;
   }
 }
 
 function copyAllCode(){
   navigator.clipboard.writeText(getCode());
+  const copyToast = document.getElementById('copyToast');
   copyToast.classList.add('show');
-  setTimeout(()=>copyToast.classList.remove('show'),1000);
+  setTimeout(() => copyToast.classList.remove('show'), 1000);
 }
 
-function undoCode(){ if(monacoEnabled) editor.trigger('keyboard','undo'); }
-function redoCode(){ if(monacoEnabled) editor.trigger('keyboard','redo'); }
-function findText(q){ if(q && monacoEnabled) editor.trigger('keyboard','actions.find',{searchString:q}); }
+function undoCode(){ if(monacoEnabled) editor.trigger('keyboard', 'undo'); }
+function redoCode(){ if(monacoEnabled) editor.trigger('keyboard', 'redo'); }
 
+/* ===== FIND BUTTON FUNCTION ===== */
+function triggerFind(){ 
+  if(monacoEnabled) {
+    editor.trigger('keyboard', 'actions.find');
+  } else {
+    alert("Find function works best in Monaco ON mode.");
+  }
+}
+
+/* ===== CUSTOM EXTENSION TOGGLE ===== */
+function checkCustomExt(val){
+  const customInput = document.getElementById('customExt');
+  if(val === 'other'){
+    customInput.style.display = 'inline-block';
+    customInput.focus();
+  } else {
+    customInput.style.display = 'none';
+  }
+}
+
+/* ===== SAVE FILE FUNCTION ===== */
+function saveToFile(){
+  const code = getCode();
+  const nameInput = document.getElementById('fileName').value.trim() || 'code';
+  const selectVal = document.getElementById('fileExt').value;
+  
+  let ext = selectVal;
+  if(selectVal === 'other'){
+    let customVal = document.getElementById('customExt').value.trim();
+    if(!customVal) customVal = '.txt';
+    if(!customVal.startsWith('.')) customVal = '.' + customVal;
+    ext = customVal;
+  }
+
+  const fullFileName = nameInput + ext;
+
+  const blob = new Blob([code], { type: 'text/plain;charset=utf-8' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = fullFileName;
+  link.click();
+  URL.revokeObjectURL(link.href);
+}
+
+/* ===== RUN CODE ===== */
 function runCode(){
+  const output = document.getElementById('output');
+  const runner = document.getElementById('runner');
   output.srcdoc = getCode();
-  runner.style.display='flex';
+  runner.style.display = 'block';
 }
-function refreshRun(){ output.srcdoc = output.srcdoc; }
-function closeRun(){ runner.style.display='none'; }
 
-/* ===== BUTTON GLOW ===== */
-document.querySelectorAll('button').forEach(btn=>{
-  btn.addEventListener('touchstart',()=>btn.classList.add('btn-pressed'),{passive:true});
-  btn.addEventListener('touchend',()=>setTimeout(()=>btn.classList.remove('btn-pressed'),120));
+function refreshRun(){ 
+  const output = document.getElementById('output');
+  output.srcdoc = output.srcdoc; 
+}
+
+function closeRun(){ 
+  document.getElementById('runner').style.display = 'none'; 
+}
+
+/* ===== BUTTON GLOW TOUCH ===== */
+document.querySelectorAll('button').forEach(btn => {
+  btn.addEventListener('touchstart', () => btn.classList.add('btn-pressed'), {passive: true});
+  btn.addEventListener('touchend', () => setTimeout(() => btn.classList.remove('btn-pressed'), 120));
 });
 </script>
 
