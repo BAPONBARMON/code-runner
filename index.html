@@ -11,7 +11,6 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-/* ===== PAGE ===== */
 html, body{
   margin: 0;
   padding: 0;
@@ -63,7 +62,6 @@ html, body{
   transform: scale(0.94);
 }
 
-/* ===== EDITOR WRAPPER ===== */
 .editor-wrapper{
   flex: 1;
   min-height: 0;
@@ -71,13 +69,11 @@ html, body{
   padding-bottom: 48px; /* space for run bar */
 }
 
-/* ===== MONACO ===== */
 #editor{
   width: 100%;
   height: 100%;
 }
 
-/* ===== MONACO OFF (TEXTAREA + LINE NUMBERS) ===== */
 #plainEditor{
   display: none;
   height: 100%;
@@ -111,18 +107,17 @@ html, body{
   overflow: auto;
 }
 
-/* ===== RUN BAR ===== */
 .run-bar{
   position: fixed !important;
   bottom: 0 !important;
   left: 0 !important;
   width: 100% !important;
   height: 48px !important;
-  padding: 0 12px !important; /* Slight padding to keep buttons balanced */
+  padding: 0 12px !important;
   border-top: 1px solid #00ff7f33;
   display: flex !important;
   align-items: center !important;
-  justify-content: center !important; /* Centered layout */
+  justify-content: center !important;
   gap: 8px !important;
   background: #121216 !important;
   z-index: 1000 !important;
@@ -137,7 +132,6 @@ html, body{
   min-width: 0 !important;
 }
 
-/* UNIFORM HEIGHT (32px) */
 .save-input{
   height: 32px !important;
   background: #1a1a24;
@@ -228,9 +222,9 @@ html, body{
   flex-shrink: 0 !important;
 }
 
-/* ===== FIX FOR MOBILE FIND MATCH COUNTER ===== */
+/* Monaco Find Match Counter Fix */
 .monaco-editor .find-widget {
-  min-width: 280px !important; /* Ensures enough width for "1 of X" */
+  min-width: 280px !important;
   max-width: 95vw !important;
   right: 10px !important;
 }
@@ -242,45 +236,89 @@ html, body{
   font-size: 11px !important;
 }
 
-/* ===== RUNNER & FLOATING BUTTONS ===== */
 #runner{
   position: fixed;
   inset: 0;
-  background: #fff;
+  background: #0a0a0c;
   display: none;
   z-index: 9999;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .floating-bar{
   position: absolute;
-  top: 12px;
-  right: 12px;
+  top: 10px;
+  right: 10px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   z-index: 10000;
 }
 
-.float-btn{
-  height: 34px;
-  padding: 0 14px;
-  background: rgba(10, 10, 15, 0.8);
-  color: #00ff7f;
-  border: 1px solid rgba(0, 255, 127, 0.4);
-  border-radius: 20px;
-  font-size: 11px;
-  font-weight: 800;
-  cursor: pointer;
-  backdrop-filter: blur(8px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+/* SMALLER COMPACT ICON BUTTONS */
+.icon-only-btn{
+  width: 32px !important;
+  height: 32px !important;
+  padding: 0 !important;
+  background: #121216 !important;
+  color: #00ff7f !important;
+  border: 1px solid #00ff7f88 !important;
+  border-radius: 50% !important;
+  font-size: 14px !important;
+  font-weight: 900 !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.6) !important;
+  transition: transform 0.2s, background 0.2s, box-shadow 0.2s !important;
 }
 
-.float-close{
-  color: #ff5555;
-  border-color: rgba(255, 85, 85, 0.4);
+.icon-only-btn:hover{
+  background: #00ff7f !important;
+  color: #000 !important;
+  transform: scale(1.08);
+}
+
+.icon-only-btn.active-mobile{
+  background: #00ff7f !important;
+  color: #000 !important;
+  box-shadow: 0 0 12px #00ff7f !important;
+}
+
+.icon-close-btn{
+  color: #ff5555 !important;
+  border-color: #ff555588 !important;
+}
+
+.icon-close-btn:hover{
+  background: #ff5555 !important;
+  color: #fff !important;
+}
+
+.phone-shell {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* REALISTIC MOBILE PREVIEW MODE */
+.phone-shell.mobile-mode {
+  width: 375px;
+  height: 720px;
+  max-width: 90vw;
+  max-height: 82vh;
+  border-radius: 38px;
+  border: 10px solid #1f1f28;
+  box-shadow: 0 0 0 2px #333344, 0 20px 50px rgba(0, 0, 0, 0.9), 0 0 25px rgba(0, 255, 127, 0.25);
+  overflow: hidden;
+  background: #fff;
 }
 
 #output{
@@ -288,6 +326,7 @@ html, body{
   height: 100%;
   border: none;
   background: #fff;
+  transition: all 0.3s ease;
 }
 
 /* ===== COPY TOAST ===== */
@@ -313,7 +352,7 @@ html, body{
 }
 #copyToast.show{opacity: 1;}
 
-/* ===== LIGHT TRANSPARENT YELLOW FIND HIGHLIGHT ===== */
+/* Light Transparent Yellow Find Highlight */
 .monaco-editor .findMatch {
   background-color: rgba(255, 235, 59, 0.35) !important;
   color: inherit !important;
@@ -381,13 +420,15 @@ html, body{
   <button class="run-btn" onclick="runCode()">Run Code ►</button>
 </div>
 
-<!-- RUNNER -->
 <div id="runner">
   <div class="floating-bar">
-    <button class="float-btn" onclick="refreshRun()">↻ Refresh</button>
-    <button class="float-btn float-close" onclick="closeRun()">✕ Close</button>
+    <button class="icon-only-btn" onclick="refreshRun()" title="Refresh">↻</button>
+    <button class="icon-only-btn" id="mobBtn" onclick="toggleMobileMode()" title="Switch to Mobile View">📱</button>
+    <button class="icon-only-btn icon-close-btn" onclick="closeRun()" title="Close">✕</button>
   </div>
-  <iframe id="output"></iframe>
+  <div id="phoneShell" class="phone-shell">
+    <iframe id="output"></iframe>
+  </div>
 </div>
 
 <div id="copyToast"><span>Copied Successfully!</span></div>
@@ -588,12 +629,11 @@ function saveToFile(){
   URL.revokeObjectURL(link.href);
 }
 
-/* ===== RUN CODE ===== */
 function runCode(){
   const output = document.getElementById('output');
   const runner = document.getElementById('runner');
   output.srcdoc = getCode();
-  runner.style.display = 'block';
+  runner.style.display = 'flex';
 }
 
 function refreshRun(){ 
@@ -605,7 +645,24 @@ function closeRun(){
   document.getElementById('runner').style.display = 'none'; 
 }
 
-/* ===== BUTTON GLOW TOUCH ===== */
+/* TOGGLE REAL MOBILE PREVIEW & BUTTON ICON SWITCH */
+function toggleMobileMode(){
+  const phoneShell = document.getElementById('phoneShell');
+  const mobBtn = document.getElementById('mobBtn');
+  
+  const isMobile = phoneShell.classList.toggle('mobile-mode');
+  mobBtn.classList.toggle('active-mobile', isMobile);
+  
+  if (isMobile) {
+    mobBtn.textContent = '💻';
+    mobBtn.title = 'Switch to Desktop View';
+  } else {
+    mobBtn.textContent = '📱';
+    mobBtn.title = 'Switch to Mobile View';
+  }
+}
+
+/* Button glow effect on touch */
 document.querySelectorAll('button').forEach(btn => {
   btn.addEventListener('touchstart', () => btn.classList.add('btn-pressed'), {passive: true});
   btn.addEventListener('touchend', () => setTimeout(() => btn.classList.remove('btn-pressed'), 120));
